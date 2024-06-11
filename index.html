@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mooring Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialisation de la carte
+        var map = L.map('map').setView([18.0, -63.0], 10);
+
+        // Ajouter des tuiles OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Les coordonnées de tes mouillages
+        var moorings = [
+            {name: "Molly Beday", lat: 18.02361, lng: -63.0004, condition: "New", buoy: "Present in good condition", pickupBuoy: "Present in good condition"},
+            {name: "Cow and Calf", lat: 18.014, lng: -63.00742, condition: "New", buoy: "Present in good condition", pickupBuoy: "Present in good condition"},
+            {name: "Pelican Rock", lat: 18.01123, lng: -63.01237, condition: "Slight Wear", buoy: "Present in good condition", pickupBuoy: "Present in good condition"},
+            // Ajoute ici les autres mouillages
+        ];
+
+        // Ajouter des marqueurs pour chaque mouillage
+        moorings.forEach(function(mooring) {
+            var color;
+            if ((mooring.condition === "New" || mooring.condition === "Slight Wear") &&
+                mooring.buoy === "Present in good condition" &&
+                mooring.pickupBuoy === "Present in good condition") {
+                color = 'green';
+            } else if (mooring.condition === "Moderate Wear" || mooring.condition === "Heavy Wear" ||
+                       mooring.buoy === "Present and need to be changed" ||
+                       mooring.pickupBuoy === "Present and need to be changed") {
+                color = 'orange';
+            } else {
+                color = 'red';
+            }
+
+            var marker = L.circleMarker([mooring.lat, mooring.lng], {
+                color: color,
+                radius: 8
+            }).addTo(map);
+
+            marker.bindPopup("<b>" + mooring.name + "</b><br>Condition: " + mooring.condition + "<br>Buoy: " + mooring.buoy + "<br>Pickup Buoy: " + mooring.pickupBuoy);
+        });
+    </script>
+</body>
+</html>
