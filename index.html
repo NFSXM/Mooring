@@ -26,7 +26,7 @@
         }).addTo(map);
 
         // URL de la feuille Google Sheets publiée
-        var sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Qpof8G9gTABd7CUVEAvO8FjphonEQzG2S0O1jm0jK230jsWQ7oGaEoErPegDGG8LOJFaABHDlMsA/pub?gid=2127970502&single=true&output=csv';
+        var sheetUrl = 'URL_DE_VOTRE_FICHE_PUBLIÉE_EN_CSV';
 
         // Fonction pour récupérer et afficher les données
         function updateMoorings() {
@@ -35,21 +35,31 @@
                 .then(csvText => {
                     var data = csvToArray(csvText);
                     data.forEach(function(row) {
-                        var name = row[1];
-                        var condition = row[2];
-                        var buoy = row[3];
-                        var pickupBuoy = row[4];
-                        var comments = row[5];
-                        var color = row[6];
-                        var lat = parseFloat(row[7]);
-                        var lng = parseFloat(row[8]);
+                        // Extraire les valeurs des colonnes spécifiques
+                        var horodateur = row["Horodateur"];
+                        var mooringLine = row["Mooring line"];
+                        var condition = row["Condition of the mooring line"];
+                        var buoy = row["Buoy"];
+                        var pickupBuoy = row["Pickup buoy"];
+                        var comments = row["Comments"];
+                        var color = row["Couleur"];
+                        var lat = parseFloat(row["Latitude"]);
+                        var lng = parseFloat(row["Longitude"]);
 
+                        // Créer un marqueur avec la couleur spécifiée
                         var marker = L.circleMarker([lat, lng], {
                             color: color,
                             radius: 8
                         }).addTo(map);
 
-                        marker.bindPopup("<b>" + name + "</b><br>Condition: " + condition + "<br>Buoy: " + buoy + "<br>Pickup Buoy: " + pickupBuoy + "<br>Comments: " + comments);
+                        // Ajouter une popup avec les informations du mouillage
+                        marker.bindPopup(
+                            "<b>" + mooringLine + "</b><br>" +
+                            "Condition: " + condition + "<br>" +
+                            "Buoy: " + buoy + "<br>" +
+                            "Pickup Buoy: " + pickupBuoy + "<br>" +
+                            "Comments: " + comments
+                        );
                     });
                 });
         }
@@ -62,10 +72,10 @@
             return rows.map(function (row) {
                 const values = row.split(delimiter);
                 const el = headers.reduce(function (object, header, index) {
-                    object[header] = values[index];
+                    object[header.trim()] = values[index].trim();
                     return object;
                 }, {});
-                return Object.values(el);
+                return el;
             });
         }
 
@@ -75,4 +85,5 @@
     </script>
 </body>
 </html>
+
 
