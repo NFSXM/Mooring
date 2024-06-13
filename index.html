@@ -25,36 +25,54 @@
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // Les coordonnées de tes mouillages
-        var moorings = [
-            {name: "Molly Beday", lat: 18.02361, lng: -63.0004, condition: "New", buoy: "Present in good condition", pickupBuoy: "Present in good condition"},
-            {name: "Cow and Calf", lat: 18.014, lng: -63.00742, condition: "New", buoy: "Present in good condition", pickupBuoy: "Present in good condition"},
-            {name: "Pelican Rock", lat: 18.01123, lng: -63.01237, condition: "Slight Wear", buoy: "Present in good condition", pickupBuoy: "Present in good condition"},
-            // Ajoute ici les autres mouillages
-        ];
+        // URL de la feuille Google Sheets publiée
+        var sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Qpof8G9gTABd7CUVEAvO8FjphonEQzG2S0O1jm0jK230jsWQ7oGaEoErPegDGG8LOJFaABHDlMsA/pub?output=csv';
 
-        // Ajouter des marqueurs pour chaque mouillage
-        moorings.forEach(function(mooring) {
-            var color;
-            if ((mooring.condition === "New" || mooring.condition === "Slight Wear") &&
-                mooring.buoy === "Present in good condition" &&
-                mooring.pickupBuoy === "Present in good condition") {
-                color = 'green';
-            } else if (mooring.condition === "Moderate Wear" || mooring.condition === "Heavy Wear" ||
-                       mooring.buoy === "Present and need to be changed" ||
-                       mooring.pickupBuoy === "Present and need to be changed") {
-                color = 'orange';
-            } else {
-                color = 'red';
-            }
+        // Fonction pour récupérer et afficher les données
+        function updateMoorings() {
+            fetch(sheetUrl)
+                .then(response => response.text())
+                .then(csvText => {
+                    var data = csvToArray(csvText);
+                    data.forEach(function(row) {
+                        var name = row[1];
+                        var condition = row[2];
+                        var buoy = row[3];
+                        var pickupBuoy = row[4];
+                        var comments = row[5];
+                        var color = row[6];
+                        var lat = parseFloat(row[7]);
+                        var lng = parseFloat(row[8]);
 
-            var marker = L.circleMarker([mooring.lat, mooring.lng], {
-                color: color,
-                radius: 8
-            }).addTo(map);
+                        var marker = L.circleMarker([lat, lng], {
+                            color: color,
+                            radius: 8
+                        }).addTo(map);
 
-            marker.bindPopup("<b>" + mooring.name + "</b><br>Condition: " + mooring.condition + "<br>Buoy: " + mooring.buoy + "<br>Pickup Buoy: " + mooring.pickupBuoy);
-        });
+                        marker.bindPopup("<b>" + name + "</b><br>Condition: " + condition + "<br>Buoy: " + buoy + "<br>Pickup Buoy: " + pickupBuoy + "<br>Comments: " + comments);
+                    });
+                });
+        }
+
+        // Convertir CSV en tableau
+        function csvToArray(str, delimiter = ",") {
+            const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
+            const rows = str.slice(str.indexOf("\n") + 1).split("\n");
+
+            return rows.map(function (row) {
+                const values = row.split(delimiter);
+                const el = headers.reduce(function (object, header, index) {
+                    object[header] = values[index];
+                    return object;
+                }, {});
+                return Object.values(el);
+            });
+        }
+
+        // Mettre à jour les mouillages toutes les heures
+        updateMoorings();
+        setInterval(updateMoorings, 3600000); // 3600000ms = 1 heure
     </script>
 </body>
 </html>
+
