@@ -28,7 +28,7 @@
         // URL de la feuille Google Sheets publiée (remplacer par l'URL de votre feuille)
         var sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Qpof8G9gTABd7CUVEAvO8FjphonEQzG2S0O1jm0jK230jsWQ7oGaEoErPegDGG8LOJFaABHDlMsA/pub?gid=2127970502&single=true&output=csv';
 
-  // Fonction pour récupérer et afficher les données
+        // Fonction pour récupérer et afficher les données
         function updateMoorings() {
             fetch(sheetUrl)
                 .then(response => {
@@ -92,9 +92,9 @@
             const rows = str.slice(str.indexOf("\n") + 1).split("\n");
 
             return rows.map(function (row) {
-                const values = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g); // Utiliser une expression régulière pour gérer les virgules entre guillemets
+                const values = row.split(delimiter);
                 const el = headers.reduce(function (object, header, index) {
-                    object[header.trim()] = values[index] ? values[index].replace(/(^"|"$)/g, '').trim() : ''; // Enlever les guillemets
+                    object[header.trim()] = values[index] ? values[index].trim() : '';
                     return object;
                 }, {});
                 return el;
@@ -107,6 +107,7 @@
     </script>
 </body>
 </html>
+
 
 
 
