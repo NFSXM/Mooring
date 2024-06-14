@@ -43,6 +43,7 @@
                     console.log("Parsed Data:", data); // Log des données analysées
                     data.forEach(function(row) {
                         // Extraire les valeurs des colonnes spécifiques
+                        var Horodateur = row["Horodateur"]
                         var mooringLine = row["Mooring line"];
                         var condition = row["Condition of the mooring line"];
                         var buoy = row["Buoy"];
