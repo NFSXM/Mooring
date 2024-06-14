@@ -25,7 +25,7 @@
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // URL de la feuille Google Sheets publiée
+        // URL de la feuille Google Sheets publiée (remplacer par l'URL de votre feuille)
         var sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Qpof8G9gTABd7CUVEAvO8FjphonEQzG2S0O1jm0jK230jsWQ7oGaEoErPegDGG8LOJFaABHDlMsA/pub?gid=2127970502&single=true&output=csv';
 
         // Fonction pour récupérer et afficher les données
@@ -33,7 +33,9 @@
             fetch(sheetUrl)
                 .then(response => response.text())
                 .then(csvText => {
+                    console.log("CSV Data:", csvText); // Log du CSV brut
                     var data = csvToArray(csvText);
+                    console.log("Parsed Data:", data); // Log des données analysées
                     data.forEach(function(row) {
                         // Extraire les valeurs des colonnes spécifiques
                         var horodateur = row["Horodateur"];
@@ -46,20 +48,26 @@
                         var lat = parseFloat(row["Latitude"]);
                         var lng = parseFloat(row["Longitude"]);
 
-                        // Créer un marqueur avec la couleur spécifiée
-                        var marker = L.circleMarker([lat, lng], {
-                            color: red,
-                            radius: 10
-                        }).addTo(map);
+                        console.log("Mooring Point:", mooringLine, lat, lng, color); // Log des points de mouillage
 
-                        // Ajouter une popup avec les informations du mouillage
-                        marker.bindPopup(
-                            "<b>" + mooringLine + "</b><br>" +
-                            "Condition: " + condition + "<br>" +
-                            "Buoy: " + buoy + "<br>" +
-                            "Pickup Buoy: " + pickupBuoy + "<br>" +
-                            "Comments: " + comments
-                        );
+                        if (!isNaN(lat) && !isNaN(lng)) { // Vérifier si les coordonnées sont valides
+                            // Créer un marqueur avec la couleur spécifiée
+                            var marker = L.circleMarker([lat, lng], {
+                                color: color,
+                                radius: 8
+                            }).addTo(map);
+
+                            // Ajouter une popup avec les informations du mouillage
+                            marker.bindPopup(
+                                "<b>" + mooringLine + "</b><br>" +
+                                "Condition: " + condition + "<br>" +
+                                "Buoy: " + buoy + "<br>" +
+                                "Pickup Buoy: " + pickupBuoy + "<br>" +
+                                "Comments: " + comments
+                            );
+                        } else {
+                            console.error("Invalid coordinates for mooring:", mooringLine, lat, lng);
+                        }
                     });
                 });
         }
@@ -81,9 +89,10 @@
 
         // Mettre à jour les mouillages toutes les heures
         updateMoorings();
-        setInterval(updateMoorings, 10); // 3600000ms = 1 heure
+        setInterval(updateMoorings, 3600000); // 3600000ms = 1 heure
     </script>
 </body>
 </html>
+
 
 
