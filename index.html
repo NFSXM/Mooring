@@ -53,6 +53,9 @@
                             var color = row["Couleur"];
                             var lat = parseFloat(row["Latitude"]);
                             var lng = parseFloat(row["Longitude"]);
+                            var type = row["Type of attachment"];
+                            var nick = row["Nick name"];
+                        
 
                             // Vérifier si les coordonnées sont valides
                             if (isNaN(lat) || isNaN(lng)) {
@@ -62,9 +65,13 @@
                             console.log("Mooring Point:", mooringLine, lat, lng, color); // Log des points de mouillage
 
                             // Créer un marqueur avec la couleur spécifiée
-                            var marker = L.circleMarker([lat, lng], {
+                            var circleMarker = L.circleMarker([lat, lng], {
                                 color: color,
-                                radius: 8
+                                radius: 8,
+                                weight: 2, // Bordure plus épaisse
+                                opacity: 1,
+                                fillOpacity: 0.8,
+                                fillColor: color
                             }).addTo(map);
 
                             // Ajouter une popup avec les informations du mouillage
@@ -74,6 +81,10 @@
                                 "Condition: " + condition + "<br>" +
                                 "Buoy: " + buoy + "<br>" +
                                 "Pickup Buoy: " + pickupBuoy + "<br>" +
+                                "Latitude : " + lat  + "<br>" +
+                                "Longitude: " + lng + "<br>" +
+                                "Type of attachment: " + type + "<br>" +
+                                "Nick name: " + nick + "<br>" +
                                 "Comments: " + comments
                             );
                         } catch (error) {
