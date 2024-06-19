@@ -66,9 +66,11 @@
                             // Créer un marqueur avec la couleur spécifiée
                             var marker = L.circleMarker([lat, lng], {
                                 color: color,
-                                radius: 3.5, // Bordure plus épaisse
-                                opacity: 10,
-                                fillColor: color
+                                radius: 8, // Taille du marqueur
+                                weight: 2, // Épaisseur de la bordure
+                                opacity: 1, // Opacité de la bordure
+                                fillOpacity: 1, // Opacité de remplissage
+                                fillColor: color // Couleur de remplissage
                             }).addTo(map);
 
                             // Ajouter une popup avec les informations du mouillage
@@ -115,6 +117,7 @@
     </script>
 </body>
 </html>
+
 
 
 
