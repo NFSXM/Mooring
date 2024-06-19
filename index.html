@@ -55,11 +55,10 @@
                             var lng = parseFloat(row["Longitude"]);
                             var type = row["Type of attachment"];
                             var nick = row["Nick name"];
-                        
 
                             // Vérifier si les coordonnées sont valides
-                            if (isNaN(lat) || isNaN(lng)) {
-                                throw new Error(`Invalid coordinates for mooring: ${mooringLine}, lat: ${lat}, lng: ${lng}`);
+                            if (isNaN(lat) || isNaN(lng) || !color) {
+                                throw new Error(`Invalid data for mooring: ${mooringLine}, lat: ${lat}, lng: ${lng}, color: ${color}`);
                             }
 
                             console.log("Mooring Point:", mooringLine, lat, lng, color); // Log des points de mouillage
@@ -72,7 +71,7 @@
                                 opacity: 1,
                                 fillOpacity: 0.8,
                                 fillColor: color
-                                }).addTo(map);
+                            }).addTo(map);
 
                             // Ajouter une popup avec les informations du mouillage
                             marker.bindPopup(
