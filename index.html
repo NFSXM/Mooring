@@ -31,7 +31,7 @@
             console.log("Localisation trouvée : ", e.latlng);
 
             // Réduire la taille du marqueur
-            var marker = L.circleMarker(e.latlng, {
+            var marker = L.Marker(e.latlng, {
                 radius: 5, // Taille du marqueur (ajustez selon vos besoins)
                 color: 'blue',
                 fillColor: '#30f',
