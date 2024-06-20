@@ -84,7 +84,7 @@
                             console.log("Mooring Point:", mooringLine, lat, lng, color); // Log des points de mouillage
 
                             // Créer un marqueur avec la couleur spécifiée
-                            var marker = L.Marker([lat, lng], {
+                            var marker = L.circleMarker([lat, lng], {
                                 color: color,
                                 radius: 3, // Taille du marqueur
                                 opacity: 1, // Opacité de la bordure
