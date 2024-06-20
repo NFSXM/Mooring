@@ -38,7 +38,7 @@
             var radius = e.accuracy / 2;
             console.log("Localisation trouvée : ", e.latlng);
 
-            L.marker(e.latlng, { icon: customIcon }).addTo(map)
+            L.marker(e.latlng).addTo(map)
                 .bindPopup("You are here").openPopup();
         }
 
