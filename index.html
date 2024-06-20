@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
 <head>
     <title>Mooring Map</title>
@@ -7,115 +6,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
-    #map {
-        height: 90vh;
-        width: 90%;
-    }
-</style>
+        #map {
+            height: 90vh;
+            width: 90%;
+        }
+    </style>
 </head>
 <body>
     <div id="map"></div>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-    // Initialisation de la carte
-    var map = L.map('map').setView([18.0, -63.0], 12);
 
-    // Ajouter des tuiles OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialisation de la carte
+        var map = L.map('map').setView([18.0, -63.0], 12);
 
-    // URL de la feuille Google Sheets publiée (remplacer par l'URL de votre feuille)
-    var sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Qpof8G9gTABd7CUVEAvO8FjphonEQzG2S0O1jm0jK230jsWQ7oGaEoErPegDGG8LOJFaABHDlMsA/pub?gid=2127970502&single=true&output=csv';
+        // Ajouter des tuiles OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-    // Fonction pour récupérer et afficher les données
-    function updateMoorings() {
-        fetch(sheetUrl)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.text();
-            })
-            .then(csvText => {
-                console.log("CSV Data:", csvText); // Log du CSV brut
-                var data = csvToArray(csvText);
-                console.log("Parsed Data:", data); // Log des données analysées
-                data.forEach(function(row) {
-                    try {
-                        // Extraire les valeurs des colonnes spécifiques
-                        var timestamp = row["Horodateur"];
-                        var mooringLine = row["Mooring line"];
-                        var condition = row["Condition of the mooring line"];
-                        var buoy = row["Buoy"];
-                        var pickupBuoy = row["Pickup buoy"];
-                        var comments = row["Comments"];
-                        var color = row["Couleur"];
-                        var lat = parseFloat(row["Latitude"]);
-                        var lng = parseFloat(row["Longitude"]);
-                        var type = row["Type of attachment"];
-                        var nick = row["Nick name"];
+        // Fonction pour obtenir et afficher la position GPS
+        function onLocationFound(e) {
+            var radius = e.accuracy / 2;
 
-                        // Vérifier si les coordonnées sont valides
-                        if (isNaN(lat) || isNaN(lng) || !color) {
-                            throw new Error(`Invalid data for mooring: ${mooringLine}, lat: ${lat}, lng: ${lng}, color: ${color}`);
-                        }
+            L.marker(e.latlng).addTo(map)
+                .bindPopup("You are here").openPopup();
+        }
 
-                        console.log("Mooring Point:", mooringLine, lat, lng, color); // Log des points de mouillage
+        // Fonction pour gérer les erreurs de géolocalisation
+        function onLocationError(e) {
+            alert(e.message);
+        }
 
-                        // Créer un marqueur avec la couleur spécifiée
-                        var marker = L.circleMarker([lat, lng], {
-                            color: color,
-                            radius: 3, // Taille du marqueur
-                            opacity: 1, // Opacité de la bordure
-                            fillOpacity: 1, // Opacité de remplissage
-                            fillColor: color // Couleur de remplissage
-                        }).addTo(map);
+        // Obtenir la position GPS de l'appareil
+        map.on('locationfound', onLocationFound);
+        map.on('locationerror', onLocationError);
 
-                        // Ajouter une popup avec les informations du mouillage
-                        marker.bindPopup(
-                            "<b>" + mooringLine + "</b><br>" +
-                            "Horodateur: " + timestamp + "<br>" +
-                            "Condition: " + condition + "<br>" +
-                            "Buoy: " + buoy + "<br>" +
-                            "Pickup Buoy: " + pickupBuoy + "<br>" +
-                            "Latitude : " + lat  + "<br>" +
-                            "Longitude: " + lng + "<br>" +
-                            "Type of attachment: " + type + "<br>" +
-                            "Nick name: " + nick + "<br>" +
-                            "Comments: " + comments
-                        );
-                    } catch (error) {
-                        console.error(error.message);
+        map.locate({setView: true, maxZoom: 16});
+
+        // URL de la feuille Google Sheets publiée (remplacer par l'URL de votre feuille)
+        var sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Qpof8G9gTABd7CUVEAvO8FjphonEQzG2S0O1jm0jK230jsWQ7oGaEoErPegDGG8LOJFaABHDlMsA/pub?gid=2127970502&single=true&output=csv';
+
+        // Fonction pour récupérer et afficher les données
+        function updateMoorings() {
+            fetch(sheetUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
                     }
+                    return response.text();
+                })
+                .then(csvText => {
+                    console.log("CSV Data:", csvText); // Log du CSV brut
+                    var data = csvToArray(csvText);
+                    console.log("Parsed Data:", data); // Log des données analysées
+                    data.forEach(function(row) {
+                        try {
+                            // Extraire les valeurs des colonnes spécifiques
+                            var timestamp = row["Horodateur"];
+                            var mooringLine = row["Mooring line"];
+                            var condition = row["Condition of the mooring line"];
+                            var buoy = row["Buoy"];
+                            var pickupBuoy = row["Pickup buoy"];
+                            var comments = row["Comments"];
+                            var color = row["Couleur"];
+                            var lat = parseFloat(row["Latitude"]);
+                            var lng = parseFloat(row["Longitude"]);
+                            var type = row["Type of attachment"];
+                            var nick = row["Nick name"];
+
+                            // Vérifier si les coordonnées sont valides
+                            if (isNaN(lat) || isNaN(lng) || !color) {
+                                throw new Error(`Invalid data for mooring: ${mooringLine}, lat: ${lat}, lng: ${lng}, color: ${color}`);
+                            }
+
+                            console.log("Mooring Point:", mooringLine, lat, lng, color); // Log des points de mouillage
+
+                            // Créer un marqueur avec la couleur spécifiée
+                            var marker = L.circleMarker([lat, lng], {
+                                color: color,
+                                radius: 3, // Taille du marqueur
+                                opacity: 1, // Opacité de la bordure
+                                fillOpacity: 1, // Opacité de remplissage
+                                fillColor: color // Couleur de remplissage
+                            }).addTo(map);
+
+                            // Ajouter une popup avec les informations du mouillage
+                            marker.bindPopup(
+                                "<b>" + mooringLine + "</b><br>" +
+                                "Horodateur: " + timestamp + "<br>" +
+                                "Condition: " + condition + "<br>" +
+                                "Buoy: " + buoy + "<br>" +
+                                "Pickup Buoy: " + pickupBuoy + "<br>" +
+                                "Latitude : " + lat  + "<br>" +
+                                "Longitude: " + lng + "<br>" +
+                                "Type of attachment: " + type + "<br>" +
+                                "Nick name: " + nick + "<br>" +
+                                "Comments: " + comments
+                            );
+                        } catch (error) {
+                            console.error(error.message);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
                 });
-            })
-            .catch(error => {
-                console.error('There has been a problem with your fetch operation:', error);
+        }
+
+        // Convertir CSV en tableau
+        function csvToArray(str, delimiter = ",") {
+            const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
+            const rows = str.slice(str.indexOf("\n") + 1).split("\n");
+
+            return rows.map(function (row) {
+                const values = row.split(delimiter);
+                const el = headers.reduce(function (object, header, index) {
+                    object[header.trim()] = values[index] ? values[index].trim() : '';
+                    return object;
+                }, {});
+                return el;
             });
-    }
+        }
 
-    // Convertir CSV en tableau
-    function csvToArray(str, delimiter = ",") {
-        const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
-        const rows = str.slice(str.indexOf("\n") + 1).split("\n");
-
-        return rows.map(function (row) {
-            const values = row.split(delimiter);
-            const el = headers.reduce(function (object, header, index) {
-                object[header.trim()] = values[index] ? values[index].trim() : '';
-                return object;
-            }, {});
-            return el;
-        });
-    }
-
-    // Mettre à jour les mouillages toutes les heures
-    updateMoorings();
-    setInterval(updateMoorings, 5000); // 3600000ms = 1 heure
-</script>
+        // Mettre à jour les mouillages toutes les heures
+        updateMoorings();
+        setInterval(updateMoorings, 30000); // 3600000ms = 1 heure
+    </script>
 </body>
 </html>
+
 
 
 
