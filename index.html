@@ -21,7 +21,12 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
         // Initialisation de la carte
-        var map = L.map('map').setView([18.0, -63.0], 12, wheelPxPerZoomLevel : 100, wheelDebounceTime: 40);
+        var map = L.map('map', {
+            center: [18.0, -63.0],
+            zoom: 12,
+            wheelPxPerZoomLevel: 100,
+            wheelDebounceTime: 40
+        });
 
         // Ajouter des tuiles OpenStreetMap
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
