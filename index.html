@@ -31,9 +31,7 @@
             console.log("Localisation trouvée : ", e.latlng);
 
             L.marker(e.latlng).addTo(map)
-                .bindPopup("Vous êtes à " + radius + " mètres de ce point").openPopup();
-
-            L.circle(e.latlng, radius).addTo(map);
+                .bindPopup("You are here").openPopup();
         }
 
         // Fonction pour gérer les erreurs de géolocalisation
@@ -86,7 +84,7 @@
                             console.log("Mooring Point:", mooringLine, lat, lng, color); // Log des points de mouillage
 
                             // Créer un marqueur avec la couleur spécifiée
-                            var marker = L.circleMarker([lat, lng], {
+                            var marker = L.Marker([lat, lng], {
                                 color: color,
                                 radius: 3, // Taille du marqueur
                                 opacity: 1, // Opacité de la bordure
