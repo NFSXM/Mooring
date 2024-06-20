@@ -26,13 +26,25 @@
         }).addTo(map);
 
         // Fonction pour obtenir et afficher la position GPS
-        function onLocationFound(e) {
+   function onLocationFound(e) {
             var radius = e.accuracy / 2;
+            console.log("Localisation trouvée : ", e.latlng);
 
-            L.marker(e.latlng).addTo(map)
-                .bindPopup("Vous êtes à " + radius + " mètres de ce point").openPopup();
+            // Réduire la taille du marqueur
+            var marker = L.circleMarker(e.latlng, {
+                radius: 5, // Taille du marqueur (ajustez selon vos besoins)
+                color: 'blue',
+                fillColor: '#30f',
+                fillOpacity: 0.7
+            }).addTo(map).bindPopup("Vous êtes à " + radius + " mètres de ce point").openPopup();
 
-            L.circle(e.latlng, radius).addTo(map);
+            // Réduire la taille du cercle de précision
+            var accuracyCircle = L.circle(e.latlng, {
+                radius: radius,
+                color: 'blue',
+                fillColor: '#30f',
+                fillOpacity: 0.1
+            }).addTo(map);
         }
 
         // Fonction pour gérer les erreurs de géolocalisation
@@ -131,9 +143,9 @@
             });
         }
 
-        // Mettre à jour les mouillages toutes les heures
+        // Mettre à jour les mouillages toutes les 30 secones
         updateMoorings();
-        setInterval(updateMoorings, 30000); // 3600000ms = 1 heure
+        setInterval(updateMoorings, 30000); 
     </script>
 </body>
 </html>
