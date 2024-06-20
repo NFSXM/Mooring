@@ -26,25 +26,14 @@
         }).addTo(map);
 
         // Fonction pour obtenir et afficher la position GPS
-   function onLocationFound(e) {
+        function onLocationFound(e) {
             var radius = e.accuracy / 2;
             console.log("Localisation trouvée : ", e.latlng);
 
-            // Réduire la taille du marqueur
-            var marker = L.Marker(e.latlng, {
-                radius: 5, // Taille du marqueur (ajustez selon vos besoins)
-                color: 'blue',
-                fillColor: '#30f',
-                fillOpacity: 0.7
-            }).addTo(map).bindPopup("Vous êtes à " + radius + " mètres de ce point").openPopup();
+            L.marker(e.latlng).addTo(map)
+                .bindPopup("Vous êtes à " + radius + " mètres de ce point").openPopup();
 
-            // Réduire la taille du cercle de précision
-            var accuracyCircle = L.circle(e.latlng, {
-                radius: radius,
-                color: 'blue',
-                fillColor: '#30f',
-                fillOpacity: 0.1
-            }).addTo(map);
+            L.circle(e.latlng, radius).addTo(map);
         }
 
         // Fonction pour gérer les erreurs de géolocalisation
