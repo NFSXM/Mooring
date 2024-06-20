@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
         #map {
-            height: 80vh;
-            width: 80%;
+            height: 90vh;
+            width: 90%;
         }
     </style>
 </head>
@@ -25,14 +25,13 @@
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-
         // Fonction pour obtenir et afficher la position GPS
         function onLocationFound(e) {
             var radius = e.accuracy / 2;
             console.log("Localisation trouvée : ", e.latlng);
 
             L.marker(e.latlng).addTo(map)
-                .bindPopup("You are here").openPopup();
+                .bindPopup("Vous êtes ici").openPopup();
         }
 
         // Fonction pour gérer les erreurs de géolocalisation
@@ -54,57 +53,57 @@
             fetch(sheetUrl)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Network response was not ok ' + response.statusText);
+                        throw new Error('Le réseau a répondu avec une erreur : ' + response.statusText);
                     }
                     return response.text();
                 })
                 .then(csvText => {
-                    console.log("CSV Data:", csvText); // Log du CSV brut
+                    console.log("Données CSV :", csvText); // Log du CSV brut
                     var data = csvToArray(csvText);
-                    console.log("Parsed Data:", data); // Log des données analysées
+                    console.log("Données analysées :", data); // Log des données analysées
                     data.forEach(function(row) {
                         try {
                             // Extraire les valeurs des colonnes spécifiques
                             var timestamp = row["Horodateur"];
-                            var mooringLine = row["Mooring line"];
-                            var condition = row["Condition of the mooring line"];
-                            var buoy = row["Buoy"];
-                            var pickupBuoy = row["Pickup buoy"];
-                            var comments = row["Comments"];
+                            var mooringLine = row["Ligne d'amarrage"];
+                            var condition = row["État de la ligne d'amarrage"];
+                            var buoy = row["Bouée"];
+                            var pickupBuoy = row["Bouée de ramassage"];
+                            var comments = row["Commentaires"];
                             var color = row["Couleur"];
                             var lat = parseFloat(row["Latitude"]);
                             var lng = parseFloat(row["Longitude"]);
-                            var type = row["Type of attachment"];
-                            var nick = row["Nick name"];
+                            var type = row["Type de fixation"];
+                            var nick = row["Surnom"];
 
                             // Vérifier si les coordonnées sont valides
                             if (isNaN(lat) || isNaN(lng) || !color) {
-                                throw new Error(`Invalid data for mooring: ${mooringLine}, lat: ${lat}, lng: ${lng}, color: ${color}`);
+                                throw new Error(`Données invalides pour l'amarrage : ${mooringLine}, lat: ${lat}, lng: ${lng}, couleur: ${color}`);
                             }
 
-                            console.log("Mooring Point:", mooringLine, lat, lng, color); // Log des points de mouillage
+                            console.log("Point d'amarrage :", mooringLine, lat, lng, color); // Log des points d'amarrage
 
                             // Créer un marqueur avec la couleur spécifiée
                             var marker = L.circleMarker([lat, lng], {
                                 color: color,
-                                radius: 5, // Taille du marqueur
+                                radius: 8, // Taille du marqueur
                                 opacity: 1, // Opacité de la bordure
                                 fillOpacity: 1, // Opacité de remplissage
                                 fillColor: color // Couleur de remplissage
                             }).addTo(map);
 
-                            // Ajouter une popup avec les informations du mouillage
+                            // Ajouter une popup avec les informations sur l'amarrage
                             marker.bindPopup(
                                 "<b>" + mooringLine + "</b><br>" +
-                                "Horodateur: " + timestamp + "<br>" +
-                                "Condition: " + condition + "<br>" +
-                                "Buoy: " + buoy + "<br>" +
-                                "Pickup Buoy: " + pickupBuoy + "<br>" +
+                                "Horodateur : " + timestamp + "<br>" +
+                                "État : " + condition + "<br>" +
+                                "Bouée : " + buoy + "<br>" +
+                                "Bouée de ramassage : " + pickupBuoy + "<br>" +
                                 "Latitude : " + lat  + "<br>" +
-                                "Longitude: " + lng + "<br>" +
-                                "Type of attachment: " + type + "<br>" +
-                                "Nick name: " + nick + "<br>" +
-                                "Comments: " + comments
+                                "Longitude : " + lng + "<br>" +
+                                "Type de fixation : " + type + "<br>" +
+                                "Surnom : " + nick + "<br>" +
+                                "Commentaires : " + comments
                             );
                         } catch (error) {
                             console.error(error.message);
@@ -112,7 +111,7 @@
                     });
                 })
                 .catch(error => {
-                    console.error('There has been a problem with your fetch operation:', error);
+                    console.error('Problème avec l\'opération de récupération :', error);
                 });
         }
 
@@ -131,7 +130,7 @@
             });
         }
 
-        // Mettre à jour les mouillages toutes les 30 secones
+        // Mettre à jour les points d'amarrage toutes les 5 secondes
         updateMoorings();
         setInterval(updateMoorings, 5000); 
     </script>
