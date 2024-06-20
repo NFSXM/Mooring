@@ -134,15 +134,16 @@
                     return object;
                 }, {});
                 return el;
-            });
+            }).filter(row => Object.keys(row).length > 1); // Filtre les lignes vides ou incomplètes
         }
 
         // Mettre à jour les mouillages toutes les heures
         updateMoorings();
-        setInterval(updateMoorings, 5000); // 3600000ms = 1 heure
+        setInterval(updateMoorings, 3600000); // 3600000ms = 1 heure
     </script>
 </body>
 </html>
+
 
 
 
