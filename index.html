@@ -5,69 +5,85 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-   <style>
-    #map {
-        height: 100vh;
-        z-index: 1; /* Assurez-vous que la carte a un z-index plus bas */
-    }
-    .leaflet-control-zoom-in,
-    .leaflet-control-zoom-out {
-        font-size: 18px;
-        width: 30px;
-        height: 30px;
-    }
-    #sidebar {
-        height: 100%;
-        width: 0;
-        position: fixed;
-        top: 0;
-        right: 0;
-        background-color: white;
-        overflow-x: hidden;
-        transition: 0.5s;
-        padding-top: 60px;
-        box-shadow: -2px 0 5px rgba(0,0,0,0.5);
-        z-index: 2; /* Assurez-vous que le volet a un z-index supérieur */
-    }
-    #sidebar a {
-        padding: 8px 8px 8px 32px;
-        text-decoration: none;
-        font-size: 25px;
-        color: #818181;
-        display: block;
-        transition: 0.3s;
-    }
-    #sidebar .closebtn {
-        position: absolute;
-        top: 0;
-        right: 25px;
-        font-size: 36px;
-    }
-    #openSidebarBtn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 30px;
-        cursor: pointer;
-        z-index: 3; /* Assurez-vous que le bouton a un z-index encore supérieur */
-    }
-    #mooringFeesList {
-        padding: 15px;
-    }
-</style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif; /* Appliquer la police Poppins à tout le corps */
+        }
+
+        #map {
+            height: 100vh;
+            z-index: 1; /* Assurez-vous que la carte a un z-index plus bas */
+        }
+
+        .leaflet-control-zoom-in,
+        .leaflet-control-zoom-out {
+            font-size: 18px;
+            width: 30px;
+            height: 30px;
+        }
+
+        #sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            top: 0;
+            right: 0;
+            background-color: white;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+            z-index: 2; /* Assurez-vous que le volet a un z-index supérieur */
+            font-family: 'Poppins', sans-serif; /* Appliquer la police Poppins au volet */
+        }
+
+        #sidebar a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #818181;
+            display: block;
+            transition: 0.3s;
+        }
+
+        #sidebar .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+        }
+
+        #openSidebarBtn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 3; /* Assurez-vous que le bouton a un z-index encore supérieur */
+        }
+
+        #mooringFeesList {
+            padding: 15px;
+            text-align: center; /* Centrer le texte */
+        }
+
+        #mooringFeesList h2 {
+            font-size: 24px;
+            font-weight: 600; /* Utiliser une version plus grasse de la police pour le titre */
+        }
+    </style>
 </head>
 <body>
-    <div id="map"></div>
-    <div id="openSidebarBtn" onclick="openNav()">☰</div>
     <div id="sidebar">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         <div id="mooringFeesList">
             <h2>Mooring Fees 2024</h2>
-            <div id="mooringFeesContent">
-                <!-- Les données de la feuille Google Sheets seront ajoutées ici -->
-            </div>
+            <!-- Les informations des frais de mouillage seront ajoutées ici -->
         </div>
     </div>
+    <div id="openSidebarBtn" onclick="openNav()">☰</div>
+    <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
@@ -106,7 +122,7 @@
         // URL de la feuille Google Sheets publiée (remplacer par l'URL de votre feuille)
         var sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Qpof8G9gTABd7CUVEAvO8FjphonEQzG2S0O1jm0jK230jsWQ7oGaEoErPegDGG8LOJFaABHDlMsA/pub?gid=2127970502&single=true&output=csv';
 
-        // Fonction pour récupérer et afficher les données des mouillages
+        // Fonction pour récupérer et afficher les données
         function updateMoorings() {
             fetch(sheetUrl)
                 .then(response => {
@@ -136,7 +152,7 @@
 
                             // Vérifier si les coordonnées sont valides
                             if (isNaN(lat) || isNaN(lng) || !color) {
-                                throw new Error(`Invalid data for mooring: ${mooringLine, lat, lng, color}`);
+                                throw new Error(`Invalid data for mooring: ${mooringLine}, lat: ${lat}, lng: ${lng}, color: ${color}`);
                             }
 
                             console.log("Mooring Point:", mooringLine, lat, lng, color); // Log des points de mouillage
@@ -190,37 +206,27 @@
 
         // Mettre à jour les mouillages toutes les heures
         updateMoorings();
-        setInterval(updateMoorings, 5000);
+        setInterval(updateMoorings, 5000); // 3600000ms = 1 heure
 
-        // Fonctions pour ouvrir et fermer le volet
         function openNav() {
-            document.getElementById("sidebar").style.width = "350px";
-            updateMooringFees();
+            document.getElementById("sidebar").style.width = "250px";
         }
 
         function closeNav() {
             document.getElementById("sidebar").style.width = "0";
         }
 
-        // Fonction pour récupérer et afficher les données des frais de mouillage
         function updateMooringFees() {
             fetch(sheetUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok ' + response.statusText);
-                    }
-                    return response.text();
-                })
+                .then(response => response.text())
                 .then(csvText => {
                     var data = csvToArray(csvText);
-                    var feesContent = document.getElementById("mooringFeesContent");
-                    feesContent.innerHTML = ""; // Effacer le contenu précédent
-
+                    var feesContent = document.getElementById("mooringFeesList");
+                    feesContent.innerHTML = "<h2>Mooring Fees 2024</h2>"; // Réinitialise le contenu et ajoute le titre
                     data.forEach(function(row) {
                         var date = row["Date"];
                         var mooringFees = row["Mooring fees"];
                         var amount = row["Amount"];
-
                         if (date && mooringFees && amount) {
                             feesContent.innerHTML += "<p>Date: " + date + "<br>Mooring Fees: " + mooringFees + "<br>Amount: " + amount + "</p><hr>";
                         }
@@ -230,9 +236,13 @@
                     console.error('There has been a problem with your fetch operation:', error);
                 });
         }
+
+        // Appelez la fonction updateMooringFees pour mettre à jour le contenu du volet
+        updateMooringFees();
     </script>
 </body>
 </html>
+
 
 
 
