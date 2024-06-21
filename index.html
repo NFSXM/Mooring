@@ -13,10 +13,57 @@
             width: 30px;
             height: 30px;
         }
+        #sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            top: 0;
+            right: 0;
+            background-color: white;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.5);
+        }
+        #sidebar a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #818181;
+            display: block;
+            transition: 0.3s;
+        }
+        #sidebar .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+        }
+        #openSidebarBtn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        #mooringFeesList {
+            padding: 15px;
+        }
     </style>
 </head>
 <body>
     <div id="map"></div>
+    <div id="openSidebarBtn" onclick="openNav()">☰</div>
+    <div id="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <div id="mooringFeesList">
+            <h2>Mooring Fees 2024</h2>
+            <div id="mooringFeesContent">
+                <!-- Les données de la feuille Google Sheets seront ajoutées ici -->
+            </div>
+        </div>
+    </div>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
@@ -55,7 +102,7 @@
         // URL de la feuille Google Sheets publiée (remplacer par l'URL de votre feuille)
         var sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Qpof8G9gTABd7CUVEAvO8FjphonEQzG2S0O1jm0jK230jsWQ7oGaEoErPegDGG8LOJFaABHDlMsA/pub?gid=2127970502&single=true&output=csv';
 
-        // Fonction pour récupérer et afficher les données
+        // Fonction pour récupérer et afficher les données des mouillages
         function updateMoorings() {
             fetch(sheetUrl)
                 .then(response => {
@@ -85,7 +132,7 @@
 
                             // Vérifier si les coordonnées sont valides
                             if (isNaN(lat) || isNaN(lng) || !color) {
-                                throw new Error(`Invalid data for mooring: ${mooringLine}, lat: ${lat}, lng: ${lng}, color: ${color}`);
+                                throw new Error(`Invalid data for mooring: ${mooringLine, lat, lng, color}`);
                             }
 
                             console.log("Mooring Point:", mooringLine, lat, lng, color); // Log des points de mouillage
@@ -139,7 +186,46 @@
 
         // Mettre à jour les mouillages toutes les heures
         updateMoorings();
-        setInterval(updateMoorings, 3600000); // 3600000ms = 1 heure
+        setInterval(updateMoorings, 5000);
+
+        // Fonctions pour ouvrir et fermer le volet
+        function openNav() {
+            document.getElementById("sidebar").style.width = "350px";
+            updateMooringFees();
+        }
+
+        function closeNav() {
+            document.getElementById("sidebar").style.width = "0";
+        }
+
+        // Fonction pour récupérer et afficher les données des frais de mouillage
+        function updateMooringFees() {
+            fetch(sheetUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.text();
+                })
+                .then(csvText => {
+                    var data = csvToArray(csvText);
+                    var feesContent = document.getElementById("mooringFeesContent");
+                    feesContent.innerHTML = ""; // Effacer le contenu précédent
+
+                    data.forEach(function(row) {
+                        var date = row["Date"];
+                        var mooringFees = row["Mooring fees"];
+                        var amount = row["Amount"];
+
+                        if (date && mooringFees && amount) {
+                            feesContent.innerHTML += "<p>Date: " + date + "<br>Mooring Fees: " + mooringFees + "<br>Amount: " + amount + "</p><hr>";
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                });
+        }
     </script>
 </body>
 </html>
