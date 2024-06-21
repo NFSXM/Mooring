@@ -8,12 +8,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Poppins', sans-serif; /* Appliquer la police Poppins à tout le corps */
+            font-family: 'Poppins', sans-serif;
         }
 
         #map {
             height: 100vh;
-            z-index: 1; /* Assurez-vous que la carte a un z-index plus bas */
+            z-index: 1;
         }
 
         .leaflet-control-zoom-in,
@@ -34,8 +34,11 @@
             transition: 0.5s;
             padding-top: 60px;
             box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
-            z-index: 2; /* Assurez-vous que le volet a un z-index supérieur */
-            font-family: 'Poppins', sans-serif; /* Appliquer la police Poppins au volet */
+            z-index: 2;
+        }
+
+        #sidebar .content {
+            padding: 15px;
         }
 
         #sidebar a {
@@ -53,25 +56,38 @@
             right: 10px;
             font-size: 30px;
             cursor: pointer;
-            z-index: 3; /* Assurez-vous que le bouton a un z-index encore supérieur */
+            z-index: 3;
         }
 
-        #mooringFeesList {
-            padding: 15px;
-            text-align: center; /* Centrer le texte */
+        .backBtn {
+            font-size: 20px;
+            cursor: pointer;
+            margin-bottom: 20px;
         }
 
-        #mooringFeesList h2 {
-            font-size: 24px;
-            font-weight: 600; /* Utiliser une version plus grasse de la police pour le titre */
+        .sub-sidebar {
+            display: none;
         }
     </style>
 </head>
 <body>
     <div id="sidebar">
-        <div id="mooringFeesList">
-            <h2>Mooring Fees 2024</h2>
-            <!-- Les informations des frais de mouillage seront ajoutées ici -->
+        <div id="mainSidebar" class="content">
+            <a href="#" onclick="showSubSidebar('feesSidebar')">Mooring Fees 2024</a>
+            <a href="#" onclick="showSubSidebar('reportSidebar')">Mooring Line Report</a>
+        </div>
+        <div id="feesSidebar" class="content sub-sidebar">
+            <div class="backBtn" onclick="showMainSidebar()">← Back</div>
+            <div id="mooringFeesList">
+                <h2>Mooring Fees 2024</h2>
+            </div>
+        </div>
+        <div id="reportSidebar" class="content sub-sidebar">
+            <div class="backBtn" onclick="showMainSidebar()">← Back</div>
+            <div id="mooringReportList">
+                <h2>Mooring Line Report</h2>
+                <!-- Les informations des rapports de lignes de mouillage seront ajoutées ici -->
+            </div>
         </div>
     </div>
     <div id="openSidebarBtn" onclick="toggleNav()">☰</div>
@@ -124,12 +140,11 @@
                     return response.text();
                 })
                 .then(csvText => {
-                    console.log("CSV Data:", csvText); // Log du CSV brut
+                    console.log("CSV Data:", csvText);
                     var data = csvToArray(csvText);
-                    console.log("Parsed Data:", data); // Log des données analysées
+                    console.log("Parsed Data:", data);
                     data.forEach(function(row) {
                         try {
-                            // Extraire les valeurs des colonnes spécifiques
                             var timestamp = row["Horodateur"];
                             var mooringLine = row["Mooring line"];
                             var condition = row["Condition of the mooring line"];
@@ -142,23 +157,20 @@
                             var type = row["Type of attachment"];
                             var nick = row["Nick name"];
 
-                            // Vérifier si les coordonnées sont valides
                             if (isNaN(lat) || isNaN(lng) || !color) {
                                 throw new Error(`Invalid data for mooring: ${mooringLine}, lat: ${lat}, lng: ${lng}, color: ${color}`);
                             }
 
-                            console.log("Mooring Point:", mooringLine, lat, lng, color); // Log des points de mouillage
+                            console.log("Mooring Point:", mooringLine, lat, lng, color);
 
-                            // Créer un marqueur avec la couleur spécifiée
                             var marker = L.circleMarker([lat, lng], {
                                 color: color,
-                                radius: 3, // Taille du marqueur
-                                opacity: 1, // Opacité de la bordure
-                                fillOpacity: 1, // Opacité de remplissage
-                                fillColor: color // Couleur de remplissage
+                                radius: 3,
+                                opacity: 1,
+                                fillOpacity: 1,
+                                fillColor: color
                             }).addTo(map);
 
-                            // Ajouter une popup avec les informations du mouillage
                             marker.bindPopup(
                                 "<b>" + mooringLine + "</b><br>" +
                                 "Horodateur: " + timestamp + "<br>" +
@@ -193,12 +205,12 @@
                     return object;
                 }, {});
                 return el;
-            }).filter(row => Object.keys(row).length > 1); // Filtre les lignes vides ou incomplètes
+            }).filter(row => Object.keys(row).length > 1);
         }
 
         // Mettre à jour les mouillages toutes les heures
         updateMoorings();
-        setInterval(updateMoorings, 5000); // 3600000ms = 1 heure
+        setInterval(updateMoorings, 5000);
 
         function toggleNav() {
             var sidebar = document.getElementById("sidebar");
@@ -209,13 +221,24 @@
             }
         }
 
+        function showMainSidebar() {
+            document.getElementById("mainSidebar").style.display = "block";
+            document.getElementById("feesSidebar").style.display = "none";
+            document.getElementById("reportSidebar").style.display = "none";
+        }
+
+        function showSubSidebar(id) {
+            document.getElementById("mainSidebar").style.display = "none";
+            document.getElementById(id).style.display = "block";
+        }
+
         function updateMooringFees() {
             fetch(sheetUrl)
                 .then(response => response.text())
                 .then(csvText => {
                     var data = csvToArray(csvText);
                     var feesContent = document.getElementById("mooringFeesList");
-                    feesContent.innerHTML = "<h2>Mooring Fees 2024</h2>"; // Réinitialise le contenu et ajoute le titre
+                    feesContent.innerHTML = "<h2>Mooring Fees 2024</h2>";
                     data.forEach(function(row) {
                         var date = row["Date"];
                         var mooringFees = row["Mooring fees"];
@@ -230,7 +253,6 @@
                 });
         }
 
-        // Appelez la fonction updateMooringFees pour mettre à jour le contenu du volet
         updateMooringFees();
     </script>
 </body>
