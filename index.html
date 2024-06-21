@@ -44,10 +44,14 @@
         #sidebar a {
             padding: 8px 8px 8px 32px;
             text-decoration: none;
-            font-size: 25px;
+            font-size: 18px;
             color: #818181;
             display: block;
             transition: 0.3s;
+        }
+
+        #sidebar a:hover {
+            color: blue;
         }
 
         #openSidebarBtn {
@@ -68,12 +72,27 @@
         .sub-sidebar {
             display: none;
         }
+
+        .home {
+            text-align: center;
+            font-weight: bold;
+            font-size: 24px;
+            color: black;
+            margin-bottom: 30px;
+        }
+
+        .separator {
+            border-top: 1px solid #ccc;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
     <div id="sidebar">
         <div id="mainSidebar" class="content">
+            <div class="home">Home</div>
             <a href="#" onclick="showSubSidebar('feesSidebar')">Mooring Fees 2024</a>
+            <div class="separator"></div>
             <a href="#" onclick="showSubSidebar('reportSidebar')">Mooring Line Report</a>
         </div>
         <div id="feesSidebar" class="content sub-sidebar">
@@ -257,13 +276,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
