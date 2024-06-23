@@ -252,20 +252,24 @@
         updateMoorings();
 
         // Gestion des barres latérales
-        function showSubSidebar(id) {
-            // Masquer toutes les sous-barres latérales
-            var subSidebars = document.getElementsByClassName('sub-sidebar');
-            for (var i = 0; i < subSidebars.length; i++) {
-                subSidebars[i].style.display = 'none';
-            }
+      function showSubSidebar(id) {
+    // Masquer toutes les sous-barres latérales
+    var subSidebars = document.getElementsByClassName('sub-sidebar');
+    for (var i = 0; i < subSidebars.length; i++) {
+        subSidebars[i].style.display = 'none';
+    }
 
-            // Masquer la barre latérale principale
-            document.getElementById('mainSidebar').style.display = 'none';
+    // Masquer la barre latérale principale
+    document.getElementById('mainSidebar').style.display = 'none';
 
-            // Afficher la sous-barre latérale spécifique
-            document.getElementById(id).style.display = 'block';
-        }
+    // Afficher la sous-barre latérale spécifique
+    document.getElementById(id).style.display = 'block';
 
+    // Appeler la fonction updateMooringFees si la sous-barre latérale feesSidebar est affichée
+    if (id === 'feesSidebar') {
+        updateMooringFees();
+    }
+}
         function showMainSidebar() {
             // Masquer toutes les sous-barres latérales
             var subSidebars = document.getElementsByClassName('sub-sidebar');
