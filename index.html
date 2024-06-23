@@ -106,166 +106,168 @@
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-        // Initialisation de la carte
-        var map = L.map('map', {
-            center: [18.0, -63.0],
-            zoom: 12,
-            wheelPxPerZoomLevel: 100,
-            wheelDebounceTime: 40
-        });
+<script>
+    // Initialisation de la carte
+    var map = L.map('map', {
+        center: [18.0, -63.0],
+        zoom: 12,
+        wheelPxPerZoomLevel: 100,
+        wheelDebounceTime: 40
+    });
 
-        // Ajouter des tuiles OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+    // Ajouter des tuiles OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-        // Fonction pour obtenir et afficher la position GPS
-        function onLocationFound(e) {
-            var radius = e.accuracy / 2;
+    // Fonction pour obtenir et afficher la position GPS
+    function onLocationFound(e) {
+        var radius = e.accuracy / 2;
 
-            L.marker(e.latlng).addTo(map)
-                .bindPopup("You are here").openPopup();
-        }
+        L.marker(e.latlng).addTo(map)
+            .bindPopup("You are here").openPopup();
+    }
 
-        // Fonction pour gérer les erreurs de géolocalisation
-        function onLocationError(e) {
-            alert(e.message);
-        }
+    // Fonction pour gérer les erreurs de géolocalisation
+    function onLocationError(e) {
+        alert(e.message);
+    }
 
-        // Obtenir la position GPS de l'appareil
-        map.on('locationfound', onLocationFound);
-        map.on('locationerror', onLocationError);
+    // Obtenir la position GPS de l'appareil
+    map.on('locationfound', onLocationFound);
+    map.on('locationerror', onLocationError);
 
-        map.locate({setView: true, maxZoom: 16});
+    map.locate({setView: true, maxZoom: 16});
 
-        // URL de la feuille Google Sheets publiée (remplacer par l'URL de votre feuille)
-        var sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Qpof8G9gTABd7CUVEAvO8FjphonEQzG2S0O1jm0jK230jsWQ7oGaEoErPegDGG8LOJFaABHDlMsA/pub?gid=2127970502&single=true&output=csv';
+    // URL de la feuille Google Sheets publiée (remplacer par l'URL de votre feuille)
+    var sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Qpof8G9gTABd7CUVEAvO8FjphonEQzG2S0O1jm0jK230jsWQ7oGaEoErPegDGG8LOJFaABHDlMsA/pub?gid=2127970502&single=true&output=csv';
 
-        // Fonction pour récupérer et afficher les données
-        function updateMoorings() {
-            fetch(sheetUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok ' + response.statusText);
+    // Fonction pour récupérer et afficher les données
+    function updateMoorings() {
+        fetch(sheetUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.text();
+            })
+            .then(csvText => {
+                console.log("CSV Data:", csvText);
+                var data = csvToArray(csvText);
+                console.log("Parsed Data:", data);
+                data.forEach(function(row) {
+                    try {
+                        var timestamp = row["Horodateur"];
+                        var mooringLine = row["Mooring line"];
+                        var condition = row["Condition of the mooring line"];
+                        var buoy = row["Buoy"];
+                        var pickupBuoy = row["Pickup buoy"];
+                        var comments = row["Comments"];
+                        var color = row["Couleur"];
+                        var lat = parseFloat(row["Latitude"]);
+                        var lng = parseFloat(row["Longitude"]);
+                        var type = row["Type of attachment"];
+                        var nick = row["Nick name"];
+
+                        if (isNaN(lat) || isNaN(lng) || !color) {
+                            throw new Error(`Invalid data for mooring: ${mooringLine}, lat: ${lat}, lng: ${lng}, color: ${color}`);
+                        }
+
+                        console.log("Mooring Point:", mooringLine, lat, lng, color);
+
+                        var marker = L.circleMarker([lat, lng], {
+                            color: color,
+                            radius: 3,
+                            opacity: 1,
+                            fillOpacity: 1,
+                            fillColor: color
+                        }).addTo(map);
+
+                        marker.bindPopup(
+                            "<div class='popup-content'>" +
+                                "<div class='site-name'>" + mooringLine + "</div>" +
+                                "<div><span class='label'>Horodateur:</span> " + timestamp + "</div>" +
+                                "<div><span class='label'>Condition:</span> " + condition + "</div>" +
+                                "<div><span class='label'>Buoy:</span> " + buoy + "</div>" +
+                                "<div><span class='label'>Pickup Buoy:</span> " + pickupBuoy + "</div>" +
+                                "<div><span class='label'>Latitude:</span> " + lat + "</div>" +
+                                "<div><span class='label'>Longitude:</span> " + lng + "</div>" +
+                                "<div><span class='label'>Type of attachment:</span> " + type + "</div>" +
+                                "<div><span class='label'>Nick name:</span> " + nick + "</div>" +
+                                "<div><span class='label'>Comments:</span> " + comments + "</div>" +
+                            "</div>"
+                        );
+                    } catch (error) {
+                        console.error(error.message);
                     }
-                    return response.text();
-                })
-                .then(csvText => {
-                    console.log("CSV Data:", csvText);
-                    var data = csvToArray(csvText);
-                    console.log("Parsed Data:", data);
-                    data.forEach(function(row) {
-                        try {
-                            var timestamp = row["Horodateur"];
-                            var mooringLine = row["Mooring line"];
-                            var condition = row["Condition of the mooring line"];
-                            var buoy = row["Buoy"];
-                            var pickupBuoy = row["Pickup buoy"];
-                            var comments = row["Comments"];
-                            var color = row["Couleur"];
-                            var lat = parseFloat(row["Latitude"]);
-                            var lng = parseFloat(row["Longitude"]);
-                            var type = row["Type of attachment"];
-                            var nick = row["Nick name"];
-
-                            if (isNaN(lat) || isNaN(lng) || !color) {
-                                throw new Error(`Invalid data for mooring: ${mooringLine}, lat: ${lat}, lng: ${lng}, color: ${color}`);
-                            }
-
-                            console.log("Mooring Point:", mooringLine, lat, lng, color);
-
-                            var marker = L.circleMarker([lat, lng], {
-                                color: color,
-                                radius: 3,
-                                opacity: 1,
-                                fillOpacity: 1,
-                                fillColor: color
-                            }).addTo(map);
-
-                            marker.bindPopup(
-                                "<b>" + mooringLine + "</b><br>" +
-                                "Horodateur: " + timestamp + "<br>" +
-                                "Condition: " + condition + "<br>" +
-                                "Buoy: " + buoy + "<br>" +
-                                "Pickup Buoy: " + pickupBuoy + "<br>" +
-                                "Latitude : " + lat  + "<br>" +
-                                "Longitude: " + lng + "<br>" +
-                                "Type of attachment: " + type + "<br>" +
-                                "Nick name: " + nick + "<br>" +
-                                "Comments: " + comments
-                            );
-                        } catch (error) {
-                            console.error(error.message);
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error('There has been a problem with your fetch operation:', error);
                 });
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    }
+
+    // Convertir CSV en tableau
+    function csvToArray(str, delimiter = ",") {
+        const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
+        const rows = str.slice(str.indexOf("\n") + 1).split("\n");
+
+        return rows.map(function (row) {
+            const values = row.split(delimiter);
+            const el = headers.reduce(function (object, header, index) {
+                object[header.trim()] = values[index] ? values[index].trim() : '';
+                return object;
+            }, {});
+            return el;
+        }).filter(row => Object.keys(row).length > 1);
+    }
+
+    // Mettre à jour les mouillages toutes les heures
+    updateMoorings();
+    setInterval(updateMoorings, 5000);
+
+    function toggleNav() {
+        var sidebar = document.getElementById("sidebar");
+        if (sidebar.style.width === "250px") {
+            sidebar.style.width = "0";
+        } else {
+            sidebar.style.width = "250px";
         }
+    }
 
-        // Convertir CSV en tableau
-        function csvToArray(str, delimiter = ",") {
-            const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
-            const rows = str.slice(str.indexOf("\n") + 1).split("\n");
+    function showMainSidebar() {
+        document.getElementById("mainSidebar").style.display = "block";
+        document.getElementById("feesSidebar").style.display = "none";
+    }
 
-            return rows.map(function (row) {
-                const values = row.split(delimiter);
-                const el = headers.reduce(function (object, header, index) {
-                    object[header.trim()] = values[index] ? values[index].trim() : '';
-                    return object;
-                }, {});
-                return el;
-            }).filter(row => Object.keys(row).length > 1);
-        }
+    function showSubSidebar(id) {
+        document.getElementById("mainSidebar").style.display = "none";
+        document.getElementById(id).style.display = "block";
+    }
 
-        // Mettre à jour les mouillages toutes les heures
-        updateMoorings();
-        setInterval(updateMoorings, 5000);
-
-        function toggleNav() {
-            var sidebar = document.getElementById("sidebar");
-            if (sidebar.style.width === "250px") {
-                sidebar.style.width = "0";
-            } else {
-                sidebar.style.width = "250px";
-            }
-        }
-
-        function showMainSidebar() {
-            document.getElementById("mainSidebar").style.display = "block";
-            document.getElementById("feesSidebar").style.display = "none";
-        }
-
-        function showSubSidebar(id) {
-            document.getElementById("mainSidebar").style.display = "none";
-            document.getElementById(id).style.display = "block";
-        }
-
-        function updateMooringFees() {
-            fetch(sheetUrl)
-                .then(response => response.text())
-                .then(csvText => {
-                    var data = csvToArray(csvText);
-                    var feesContent = document.getElementById("mooringFeesList");
-                    feesContent.innerHTML = "<h2>Mooring Fees 2024</h2>";
-                    data.forEach(function(row) {
-                        var date = row["Date"];
-                        var mooringFees = row["Mooring fees"];
-                        var amount = row["Amount"];
-                        if (date && mooringFees && amount) {
-                            feesContent.innerHTML += "<p>Date: " + date + "<br>Mooring Fees: " + mooringFees + "<br>Amount: " + amount + "</p><hr>";
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error('There has been a problem with your fetch operation:', error);
+    function updateMooringFees() {
+        fetch(sheetUrl)
+            .then(response => response.text())
+            .then(csvText => {
+                var data = csvToArray(csvText);
+                var feesContent = document.getElementById("mooringFeesList");
+                feesContent.innerHTML = "<h2>Mooring Fees 2024</h2>";
+                data.forEach(function(row) {
+                    var date = row["Date"];
+                    var mooringFees = row["Mooring fees"];
+                    var amount = row["Amount"];
+                    if (date && mooringFees && amount) {
+                        feesContent.innerHTML += "<p>Date: " + date + "<br>Mooring Fees: " + mooringFees + "<br>Amount: " + amount + "</p><hr>";
+                    }
                 });
-        }
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    }
 
-        updateMooringFees();
-    </script>
+    updateMooringFees();
+</script>
 </body>
 </html>
 
