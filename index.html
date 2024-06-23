@@ -286,6 +286,29 @@
                 showMainSidebar(); // Afficher la barre latérale principale par défaut
             }
         }
+        
+    function updateMooringFees() {
+        fetch(sheetUrl)
+            .then(response => response.text())
+            .then(csvText => {
+                var data = csvToArray(csvText);
+                var feesContent = document.getElementById("mooringFeesList");
+                feesContent.innerHTML = "<h2>Mooring Fees 2024</h2>";
+                data.forEach(function(row) {
+                    var date = row["Date"];
+                    var mooringFees = row["Mooring fees"];
+                    var amount = row["Amount"];
+                    if (date && mooringFees && amount) {
+                        feesContent.innerHTML += "<p>Date: " + date + "<br>Mooring Fees: " + mooringFees + "<br>Amount: " + amount + "</p><hr>";
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    }
+
+    updateMooringFees();
     </script>
 </body>
 </html>
