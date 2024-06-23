@@ -112,8 +112,7 @@
 .logo img {
      max-width: 50%; /* Ajustez la largeur maximale de l'image selon vos besoins */
     height: auto; /* Pour conserver les proportions de l'image */
-    display: block; /* Éviter les marges inattendues */
-    margin-right: 50; /* Centre l'image horizontalement */
+    margin: 0 auto; /* Centre l'image horizontalement */
    
 }
     </style>
@@ -122,17 +121,33 @@
     <div id="sidebar">
         <div id="mainSidebar" class="content">
             <div class="logo">
-                <img src="https://scontent-mia3-2.xx.fbcdn.net/v/t39.30808-6/448093101_849810267184597_3435235656432569545_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=5f2048&_nc_ohc=MJJw1IECBbgQ7kNvgEWZOHH&_nc_ht=scontent-mia3-2.xx&oh=00_AYCP9voN8gUsdJd0VJ1uCtZM9mHVafNcX7-j8rKoDg4Zow&oe=667E38FC" alt="Logo">
+                <img src="your-logo-url.png" alt="Logo"> <!-- Remplacez "your-logo-url.png" par l'URL de votre logo -->
             </div>
             <div class="home">Home</div>
             <a href="#" onclick="showSubSidebar('feesSidebar')">Mooring Fees 2024</a>
             <div class="separator"></div>
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSc27lNzj5H2NHSY7IEgT-85HjsBurRVXGk5QVdvYGx-z_VFig/viewform" target="_blank">Mooring monitoring form</a>
+            <a href="#" onclick="showSubSidebar('reportSidebar')">Mooring Monitoring Form</a>
+            <div class="separator"></div>
+            <a href="#" onclick="showSubSidebar('rulesSidebar')">Rules in the Reserve</a> <!-- Nouveau lien -->
         </div>
         <div id="feesSidebar" class="content sub-sidebar">
             <div class="backBtn" onclick="showMainSidebar()">← Back</div>
             <div id="mooringFeesList">
                 <h2>Mooring Fees 2024</h2>
+            </div>
+        </div>
+        <div id="reportSidebar" class="content sub-sidebar">
+            <div class="backBtn" onclick="showMainSidebar()">← Back</div>
+            <div id="mooringReportList">
+                <h2>Mooring Line Report</h2>
+                <!-- Les informations des rapports de lignes de mouillage seront ajoutées ici -->
+            </div>
+        </div>
+        <div id="rulesSidebar" class="content sub-sidebar">
+            <div class="backBtn" onclick="showMainSidebar()">← Back</div>
+            <div id="rulesContent">
+                <h2>Rules in the Reserve</h2>
+                <img src="your-image-url.jpg" alt="Rules Image" style="max-width: 100%; height: auto;"> <!-- Remplacez "your-image-url.jpg" par l'URL de votre image -->
             </div>
         </div>
     </div>
