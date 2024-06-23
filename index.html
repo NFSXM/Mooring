@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mooring Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
@@ -107,15 +107,15 @@
 <body>
     <div id="sidebar">
         <div id="mainSidebar" class="content">
-            <div class="home">Accueil</div>
-            <a href="#" onclick="showSubSidebar('feesSidebar')">Frais de mouillage 2024</a>
+            <div class="home">Home</div>
+            <a href="#" onclick="showSubSidebar('feesSidebar')">Mooring Fees 2024</a>
             <div class="separator"></div>
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSc27lNzj5H2NHSY7IEgT-85HjsBurRVXGk5QVdvYGx-z_VFig/viewform" target="_blank">Formulaire de surveillance des mouillages</a>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSc27lNzj5H2NHSY7IEgT-85HjsBurRVXGk5QVdvYGx-z_VFig/viewform" target="_blank">Mooring monitoring form</a>
         </div>
         <div id="feesSidebar" class="content sub-sidebar">
-            <div class="backBtn" onclick="showMainSidebar()">← Retour</div>
+            <div class="backBtn" onclick="showMainSidebar()">← Back</div>
             <div id="mooringFeesList">
-                <h2>Frais de mouillage 2024</h2>
+                <h2>Mooring Fees 2024</h2>
             </div>
         </div>
     </div>
@@ -142,7 +142,7 @@
             var radius = e.accuracy / 2;
 
             L.marker(e.latlng).addTo(map)
-                .bindPopup("Vous êtes ici").openPopup();
+                .bindPopup("You are here").openPopup();
         }
 
         // Fonction pour gérer les erreurs de géolocalisation
@@ -164,33 +164,33 @@
             fetch(sheetUrl)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Réponse du réseau non valide ' + response.statusText);
+                        throw new Error('Network response was not ok ' + response.statusText);
                     }
                     return response.text();
                 })
                 .then(csvText => {
-                    console.log("Données CSV:", csvText);
+                    console.log("CSV Data:", csvText);
                     var data = csvToArray(csvText);
-                    console.log("Données analysées:", data);
+                    console.log("Parsed Data:", data);
                     data.forEach(function(row) {
                         try {
                             var timestamp = row["Horodateur"];
-                            var mooringLine = row["Ligne de mouillage"];
-                            var condition = row["État de la ligne de mouillage"];
-                            var buoy = row["Bouée"];
-                            var pickupBuoy = row["Bouée de ramassage"];
-                            var comments = row["Commentaires"];
+                            var mooringLine = row["Mooring line"];
+                            var condition = row["Condition of the mooring line"];
+                            var buoy = row["Buoy"];
+                            var pickupBuoy = row["Pickup buoy"];
+                            var comments = row["Comments"];
                             var color = row["Couleur"];
                             var lat = parseFloat(row["Latitude"]);
                             var lng = parseFloat(row["Longitude"]);
-                            var type = row["Type de fixation"];
-                            var nick = row["Surnom"];
+                            var type = row["Type of attachment"];
+                            var nick = row["Nick name"];
 
                             if (isNaN(lat) || isNaN(lng) || !color) {
-                                throw new Error(`Données non valides pour le mouillage: ${mooringLine}, lat: ${lat}, lng: ${lng}, couleur: ${color}`);
+                                throw new Error(`Invalid data for mooring: ${mooringLine}, lat: ${lat}, lng: ${lng}, color: ${color}`);
                             }
 
-                            console.log("Point de mouillage:", mooringLine, lat, lng, color);
+                            console.log("Mooring Point:", mooringLine, lat, lng, color);
 
                             var marker = L.circleMarker([lat, lng], {
                                 color: color,
@@ -204,14 +204,14 @@
                                 "<div class='popup-content'>" +
                                     "<div class='site-name'>" + mooringLine + "</div>" +
                                     "<div><span class='label'>Horodateur:</span> " + timestamp + "</div>" +
-                                    "<div><span class='label'>État:</span> " + condition + "</div>" +
-                                    "<div><span class='label'>Bouée:</span> " + buoy + "</div>" +
-                                    "<div><span class='label'>Bouée de ramassage:</span> " + pickupBuoy + "</div>" +
+                                    "<div><span class='label'>Condition:</span> " + condition + "</div>" +
+                                    "<div><span class='label'>Buoy:</span> " + buoy + "</div>" +
+                                    "<div><span class='label'>Pickup Buoy:</span> " + pickupBuoy + "</div>" +
                                     "<div><span class='label'>Latitude:</span> " + lat + "</div>" +
                                     "<div><span class='label'>Longitude:</span> " + lng + "</div>" +
-                                    "<div><span class='label'>Type de fixation:</span> " + type + "</div>" +
-                                    "<div><span class='label'>Surnom:</span> " + nick + "</div>" +
-                                    "<div><span class='label'>Commentaires:</span> " + comments + "</div>" +
+                                    "<div><span class='label'>Type of attachment:</span> " + type + "</div>" +
+                                    "<div><span class='label'>Nick name:</span> " + nick + "</div>" +
+                                    "<div><span class='label'>Comments:</span> " + comments + "</div>" +
                                 "</div>"
                             );
                         } catch (error) {
@@ -220,7 +220,7 @@
                     });
                 })
                 .catch(error => {
-                    console.error('Problème avec l\'opération fetch:', error);
+                    console.error('There has been a problem with your fetch operation:', error);
                 });
         }
 
