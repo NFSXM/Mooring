@@ -173,7 +173,7 @@
 
         // URL de la feuille Google Sheets publiée (remplacer par l'URL de votre feuille)
         var sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Qpof8G9gTABd7CUVEAvO8FjphonEQzG2S0O1jm0jK230jsWQ7oGaEoErPegDGG8LOJFaABHDlMsA/pub?gid=2127970502&single=true&output=csv';
-
+       
         // Fonction pour récupérer et afficher les données
         function updateMoorings() {
             fetch(sheetUrl)
@@ -216,82 +216,67 @@
                             }).addTo(map);
 
                             marker.bindPopup(
-                                "<b>" + mooringLine + "</b><br>" +
-                                "Timestamp: " + timestamp + "<br>" +
-                                "Condition: " + condition + "<br>" +
-                                "Buoy: " + buoy + "<br>" +
-                                "Pickup Buoy: " + pickupBuoy + "<br>" +
-                                "Latitude: " + lat  + "<br>" +
-                                "Longitude: " + lng + "<br>" +
-                                "Type of attachment: " + type + "<br>" +
-                                "Nick name: " + nick + "<br>" +
-                                "Comments: " + comments
+                                "<div class='popup-content'>" +
+                                    "<div class='site-name'>" + mooringLine + "</div>" +
+                                    "<div><span class='label'>Horodateur:</span> " + timestamp + "</div>" +
+                                    "<div><span class='label'>Condition:</span> " + condition + "</div>" +
+                                    "<div><span class='label'>Buoy:</span> " + buoy + "</div>" +
+                                    "<div><span class='label'>Pickup Buoy:</span> " + pickupBuoy + "</div>" +
+                                    "<div><span class='label'>Latitude:</span> " + lat + "</div>" +
+                                    "<div><span class='label'>Longitude:</span> " + lng + "</div>" +
+                                    "<div><span class='label'>Type of attachment:</span> " + type + "</div>" +
+                                    "<div><span class='label'>Nick name:</span> " + nick + "</div>" +
+                                    "<div><span class='label'>Comments:</span> " + comments + "</div>" +
+                                "</div>"
                             );
                         } catch (error) {
-                            console.error(error);
+                            console.error(error.message);
                         }
                     });
                 })
-  .catch(error => console.error('Error fetching data: ', error));
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                });
         }
 
-        // Fonction pour convertir le CSV en array d'objets
-        function csvToArray(text) {
-            const lines = text.split('\n');
-            const headers = lines[0].split(',');
-            return lines.slice(1).map(line => {
-                const values = line.split(',');
-                return headers.reduce((object, header, index) => {
-                    object[header] = values[index];
-                    return object;
-                }, {});
-            });
-        }
+    // Convertir CSV en tableau
+    function csvToArray(str, delimiter = ",") {
+        const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
+        const rows = str.slice(str.indexOf("\n") + 1).split("\n");
 
-        // Appeler la fonction pour mettre à jour les points de mouillage
-        updateMoorings();
-        setInterval(updateMoorings, 5000);
-
-        // Gestion des barres latérales
-      function showSubSidebar(id) {
-    // Masquer toutes les sous-barres latérales
-    var subSidebars = document.getElementsByClassName('sub-sidebar');
-    for (var i = 0; i < subSidebars.length; i++) {
-        subSidebars[i].style.display = 'none';
+        return rows.map(function (row) {
+            const values = row.split(delimiter);
+            const el = headers.reduce(function (object, header, index) {
+                object[header.trim()] = values[index] ? values[index].trim() : '';
+                return object;
+            }, {});
+            return el;
+        }).filter(row => Object.keys(row).length > 1);
     }
 
-    // Masquer la barre latérale principale
-    document.getElementById('mainSidebar').style.display = 'none';
+    // Mettre à jour les mouillages toutes les heures
+    updateMoorings();
+    setInterval(updateMoorings, 5000);
 
-    // Afficher la sous-barre latérale spécifique
-    document.getElementById(id).style.display = 'block';
-
-    // Appeler la fonction updateMooringFees si la sous-barre latérale feesSidebar est affichée
-    if (id === 'feesSidebar') {
-        updateMooringFees();
+    function toggleNav() {
+        var sidebar = document.getElementById("sidebar");
+        if (sidebar.style.width === "250px") {
+            sidebar.style.width = "0";
+        } else {
+            sidebar.style.width = "250px";
+        }
     }
-}
-        function showMainSidebar() {
-            // Masquer toutes les sous-barres latérales
-            var subSidebars = document.getElementsByClassName('sub-sidebar');
-            for (var i = 0; i < subSidebars.length; i++) {
-                subSidebars[i].style.display = 'none';
-            }
 
-            // Afficher la barre latérale principale
-            document.getElementById('mainSidebar').style.display = 'block';
-        }
+    function showMainSidebar() {
+        document.getElementById("mainSidebar").style.display = "block";
+        document.getElementById("feesSidebar").style.display = "none";
+    }
 
-        function toggleNav() {
-            var sidebar = document.getElementById('sidebar');
-            if (sidebar.style.width === '250px') {
-                sidebar.style.width = '0';
-            } else {
-                sidebar.style.width = '250px';
-                showMainSidebar(); // Afficher la barre latérale principale par défaut
-            }
-        }
-        
+    function showSubSidebar(id) {
+        document.getElementById("mainSidebar").style.display = "none";
+        document.getElementById(id).style.display = "block";
+    }
+
     function updateMooringFees() {
         fetch(sheetUrl)
             .then(response => response.text())
@@ -314,7 +299,7 @@
     }
 
     updateMooringFees();
-    </script>
+</script>
 </body>
 </html>
 
