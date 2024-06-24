@@ -259,11 +259,11 @@ legend.addTo(map);
                             console.log("Mooring Point:", mooringLine, lat, lng, color);
 
                             var marker = L.circleMarker([lat, lng], {
-                                color: #5d9f44,
+                                color: color,
                                 radius: 3,
-                                opacity: 1,
-                                fillOpacity: 1,
-                                fillColor: #5d9f44
+                                opacity: 0.5,
+                                fillOpacity: 0.5,
+                                fillColor: color
                             }).addTo(map);
 
                             marker.bindPopup(
