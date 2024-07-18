@@ -249,7 +249,9 @@ legend.addTo(map);
                             var color = row["Couleur"];
                             var lat = parseFloat(row["Latitude"]);
                             var lng = parseFloat(row["Longitude"]);
+                            var depth = row["Depth (m)"]
                             var type = row["Type of attachment"];
+                            var ropelenght = row["line lenght"];
                             var nick = row["Nick name"];
 
                             if (isNaN(lat) || isNaN(lng) || !color) {
@@ -276,6 +278,8 @@ legend.addTo(map);
                                     "<div><span class='label'>Latitude:</span> " + lat + "</div>" +
                                     "<div><span class='label'>Longitude:</span> " + lng + "</div>" +
                                     "<div><span class='label'>Type of attachment:</span> " + type + "</div>" +
+                                    "<div><span class='label'>Depth (m):</span> " + depth + "</div>" +
+                                    "<div><span class='label'>Rope Lenght:</span> " + ropelenght + "</div>" +
                                     "<div><span class='label'>Nick name:</span> " + nick + "</div>" +
                                     "<div><span class='label'>Comments:</span> " + comments + "</div>" +
                                 "</div>"
